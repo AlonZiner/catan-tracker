@@ -10,7 +10,8 @@ import {
   deleteDoc, 
   query, 
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  setDoc
 } from 'firebase/firestore';
 import { GameRecord, Player } from '../types';
 
@@ -109,6 +110,7 @@ export class FirebaseGameService {
         expansion: gameData.expansion,
         winner: winner.playerName,
         players: gameData.players,
+        duration: gameData.duration,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -194,21 +196,23 @@ export class FirebaseGameService {
     }
   }
 
-  async addPlayer(playerData: Omit<Player, 'id'>): Promise<string> {
-    try {
-      const playerToAdd = {
-        ...playerData,
-        joinDate: playerData.joinDate || new Date().toISOString().split('T')[0],
-        createdAt: serverTimestamp()
-      };
+  async addPlayer(playerData: Player): Promise<string> {
+  try {
+    const playerToAdd = {
+      ...playerData,
+      joinDate: playerData.joinDate || new Date().toISOString().split('T')[0],
+      createdAt: serverTimestamp()
+    };
 
-      const docRef = await addDoc(collection(db, PLAYERS_COLLECTION), playerToAdd);
-      return docRef.id;
-    } catch (error) {
-      console.error('Error adding player to Firebase:', error);
-      throw new Error('Failed to add player to Firebase');
-    }
+    // Use the player's ID from playerData
+    const docRef = doc(db, PLAYERS_COLLECTION, playerData.id);
+    await setDoc(docRef, playerToAdd);
+    return playerData.id;
+  } catch (error) {
+    console.error('Error adding player to Firebase:', error);
+    throw new Error('Failed to add player to Firebase');
   }
+}
 
   async updatePlayer(id: string, updates: Partial<Player>): Promise<void> {
     try {

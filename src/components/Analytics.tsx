@@ -990,37 +990,6 @@ const Analytics: React.FC<AnalyticsProps> = ({  games, players, onPageChange }) 
           )}
         </div>
       </div>
-
-      {/* Quick Actions */}
-      <div className="bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/30 rounded-xl p-4 sm:p-6">
-        <h3 className="text-lg font-semibold mb-4 text-blue-400">Analytics Actions</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button
-            onClick={() => onPageChange('players')}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            View Players
-          </button>
-          <button
-            onClick={() => onPageChange('games')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Game History
-          </button>
-          <button
-            onClick={() => onPageChange('add-game')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Add Game
-          </button>
-          <button
-            onClick={() => onPageChange('dashboard')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Dashboard
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

@@ -129,7 +129,7 @@ function App() {
 
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard games={games} players={players} onPageChange={setCurrentPage} />;
+        return <Dashboard onPageChange={setCurrentPage} />;
       case 'games':
         return <GameHistory games={games} players={players} onPageChange={setCurrentPage} onDeleteGame={handleDeleteGame} />;
       case 'players':
@@ -141,25 +141,12 @@ function App() {
       case 'docs':
         return <Documentation onBack={() => setCurrentPage('dashboard')} />;
       default:
-        return <Dashboard games={games} players={players} onPageChange={setCurrentPage} />;
+        return <Dashboard onPageChange={setCurrentPage} />;
     }
   };
 
   return (
     <div className="relative">
-      {/* Storage Mode Indicator */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
-          storageMode === 'firebase' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-          storageMode === 'api' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-          'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-        }`}>
-          {storageMode === 'firebase' ? '🔥 Firebase' :
-           storageMode === 'api' ? '🌐 API' :
-           '💾 Local'}
-        </div>
-      </div>
-
       <Layout currentPage={currentPage} onPageChange={setCurrentPage}>
         {renderPage()}
       </Layout>
