@@ -283,7 +283,7 @@ class DataService {
       try {
         const playerId = await this.firebaseService.addPlayer(playerData);
         this.players = await this.firebaseService.getPlayers();
-        return this.players.find(p => p.id === playerId)!;
+        return this.players.find(p => p.playerId === playerId)!;
       } catch (error) {
         console.error('Firebase add player failed:', error);
         throw error;
@@ -292,7 +292,7 @@ class DataService {
       // Fallback to local storage
       const newPlayer: Player = {
         ...playerData,
-        id: Date.now().toString()
+        playerId: Date.now().toString()
       };
       this.players.push(newPlayer);
       return newPlayer;

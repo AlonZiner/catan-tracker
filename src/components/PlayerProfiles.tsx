@@ -40,12 +40,12 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ games, players, onPageC
 
   const playersWithStats = players.map(player => ({
     ...player,
-    stats: calculatePlayerStats(player.id, filteredGames),
-    achievements: getPlayerAchievements(player.id, games)
+    stats: calculatePlayerStats(player.playerId, filteredGames),
+    achievements: getPlayerAchievements(player.playerId, games)
   })).sort((a, b) => b.stats.winRate - a.stats.winRate);
 
   const selectedPlayerData = selectedPlayer 
-    ? playersWithStats.find(p => p.id === selectedPlayer)
+    ? playersWithStats.find(p => p.playerId === selectedPlayer)
     : null;
 
   const getPlayerGames = (playerId: string) => {
@@ -91,7 +91,7 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ games, players, onPageC
   }
 
   if (selectedPlayerData) {
-    const playerGames = getPlayerGames(selectedPlayerData.id);
+    const playerGames = getPlayerGames(selectedPlayerData.playerId);
     const recentGames = playerGames.slice(0, 5);
     
     return (
@@ -403,8 +403,8 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ games, players, onPageC
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {playersWithStats.map((player, index) => (
           <div 
-            key={player.id}
-            onClick={() => setSelectedPlayer(player.id)}
+            key={player.playerId}
+            onClick={() => setSelectedPlayer(player.playerId)}
             className="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700 hover:border-gray-600 transition-all duration-200 transform hover:scale-105 cursor-pointer group hover:shadow-xl"
           >
             {/* Player Header */}
@@ -511,31 +511,6 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ games, players, onPageC
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-gradient-to-r from-purple-500/10 to-pink-600/10 border border-purple-500/30 rounded-xl p-4 sm:p-6">
-        <h3 className="text-lg font-semibold mb-4 text-purple-400">Player Actions</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <button
-            onClick={() => onPageChange('analytics')}
-            className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Compare Players
-          </button>
-          <button
-            onClick={() => onPageChange('games')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            View Games
-          </button>
-          <button
-            onClick={() => onPageChange('add-game')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Add Game
-          </button>
-        </div>
       </div>
     </div>
   );

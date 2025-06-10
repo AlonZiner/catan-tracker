@@ -855,16 +855,16 @@ const Analytics: React.FC<AnalyticsProps> = ({  games, players, onPageChange }) 
                     <tr>
                       <th className="text-left p-2 text-gray-400">Player</th>
                       {players.slice(0, 4).map(player => (
-                        <th key={player.id} className="text-center p-2 text-gray-400 min-w-[80px]">{player.name}</th>
+                        <th key={player.playerId} className="text-center p-2 text-gray-400 min-w-[80px]">{player.name}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {players.slice(0, 4).map(player => (
-                      <tr key={player.id} className="hover:bg-gray-600/50 transition-colors">
+                      <tr key={player.playerId} className="hover:bg-gray-600/50 transition-colors">
                         <td className="p-2 font-medium text-white">{player.name}</td>
                         {players.slice(0, 4).map(opponent => (
-                          <td key={opponent.id} className="text-center p-2">
+                          <td key={opponent.playerId} className="text-center p-2">
                             {player.name === opponent.name ? (
                               <span className="text-gray-500">-</span>
                             ) : (

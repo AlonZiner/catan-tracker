@@ -73,6 +73,7 @@ export function useFirebaseGames() {
       // Add players first
       for (const player of mockPlayers) {
         await firebaseService.addPlayer({
+          playerId: player.playerId,
           name: player.name,
           avatar: player.avatar,
           joinDate: player.joinDate
@@ -151,26 +152,6 @@ export function useFirebaseGames() {
     }
   };
 
-  // Player operations
-  const addPlayer = async (playerData: Omit<Player, 'id'>) => {
-    try {
-      if (!isOnline) {
-        throw new Error('Cannot add players while offline');
-      }
-
-      const playerId = await firebaseService.addPlayer(playerData);
-      
-      // Reload players
-      const updatedPlayers = await firebaseService.getPlayers();
-      setPlayers(updatedPlayers);
-      
-      return playerId;
-    } catch (error) {
-      console.error('Error adding player:', error);
-      throw error;
-    }
-  };
-
   const updatePlayer = async (id: string, updates: Partial<Player>) => {
     try {
       if (!isOnline) {
@@ -197,7 +178,7 @@ export function useFirebaseGames() {
       await firebaseService.deletePlayer(id);
       
       // Remove from local state
-      setPlayers(prev => prev.filter(player => player.id !== id));
+      setPlayers(prev => prev.filter(player => player.playerId !== id));
     } catch (error) {
       console.error('Error deleting player:', error);
       throw error;
