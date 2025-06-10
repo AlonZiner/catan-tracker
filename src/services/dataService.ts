@@ -60,7 +60,7 @@ class DataService {
         if (response.ok) {
           const data = await response.json();
           this.games = data.games || data || []; // Handle different response formats
-          
+
           const playersResponse = await fetch('/api/players');
           if (playersResponse.ok) {
             const playersData = await playersResponse.json();
@@ -145,6 +145,7 @@ class DataService {
       if (!existingPlayer) {
         console.log(`Creating new player: ${gamePlayer.playerName}`);
         await this.addPlayer({
+          playerId: (Math.max(...this.players.map(p => Number(p.playerId))) + 1) + "",
           name: gamePlayer.playerName,
           avatar: '🎲', // Default avatar
           joinDate: new Date().toISOString().split('T')[0]
@@ -196,7 +197,7 @@ class DataService {
 
   async updateGame(id: string, updates: Partial<GameRecord>): Promise<GameRecord | null> {
     await this.loadData();
-    
+
     if (this.useFirebase && this.firebaseService) {
       // Use Firebase
       try {
@@ -240,7 +241,7 @@ class DataService {
 
   async deleteGame(id: string): Promise<boolean> {
     await this.loadData();
-    
+
     if (this.useFirebase && this.firebaseService) {
       // Use Firebase
       try {
