@@ -271,7 +271,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onPageChange }) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2">
                         <span className="font-medium text-sm sm:text-base truncate">{player.name}</span>
-                        {playerStreak?.currentStreak && playerStreak.currentStreak > 0 && (
+                        {Boolean(playerStreak?.currentStreak && playerStreak.currentStreak > 0) && (
                           <span className="text-orange-400 text-xs animate-bounce">🔥{playerStreak.currentStreak}</span>
                         )}
                       </div>
