@@ -23,7 +23,7 @@ export const mockGames: GameRecord[] = [
     date: '2024-12-15',
     expansion: 'Cities & Knights',
     winner: 'Alex',
-    duration: 120,
+    duration: 124,
     players: [
       { playerId: '1', playerName: 'Alex', score: 13, startingPosition: 1, settlements: 3, cities: 4, longestRoad: true, largestArmy: false },
       { playerId: '2', playerName: 'Jordan', score: 11, startingPosition: 2, settlements: 4, cities: 2, longestRoad: false, largestArmy: true },

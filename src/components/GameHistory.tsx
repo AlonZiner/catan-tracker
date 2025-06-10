@@ -1,20 +1,39 @@
 import React, { useState } from 'react';
-import { Search, Filter, Calendar, Trophy, Users, Clock, ChevronDown, Eye, BarChart3 } from 'lucide-react';
-import { mockGames, expansions } from '../data/mockData';
+import { Search, Filter, Calendar, Trophy, Users, Clock, ChevronDown, Eye, BarChart3, Trash2 } from 'lucide-react';
+import { GameRecord, Player } from '../types';
 
 interface GameHistoryProps {
+  games: GameRecord[];
+  players: Player[];
   onPageChange: (page: string) => void;
+  onDeleteGame?: (id: string) => Promise<boolean>;
 }
 
-const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
+const GameHistory: React.FC<GameHistoryProps> = ({ 
+  games, 
+  players, 
+  onPageChange, 
+  onDeleteGame 
+}) => {
+  // Debug: Log what data GameHistory receives
+  console.log('GameHistory received data:', {
+    gamesCount: games.length,
+    playersCount: players.length,
+    firstGame: games[0] ? games[0].expansion : 'No games',
+    isUsingMockData: games.length > 0 && games[0].id.startsWith('mock') // Check if using mock data
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedExpansion, setSelectedExpansion] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
   const [dateFilter, setDateFilter] = useState({ start: '', end: '' });
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const filteredGames = mockGames
+  // Get unique expansions from actual games
+  const expansions = Array.from(new Set(games.map(game => game.expansion)));
+
+  const filteredGames = games
     .filter(game => {
       const gameDate = new Date(game.date);
       const startDate = dateFilter.start ? new Date(dateFilter.start) : null;
@@ -68,6 +87,23 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
     }
   };
 
+  const handleDeleteGame = async (gameId: string) => {
+    if (!onDeleteGame) return;
+    
+    const confirmDelete = window.confirm('Are you sure you want to delete this game? This action cannot be undone.');
+    if (!confirmDelete) return;
+    
+    setDeletingId(gameId);
+    try {
+      await onDeleteGame(gameId);
+    } catch (error) {
+      console.error('Failed to delete game:', error);
+      alert('Failed to delete game. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedExpansion('');
@@ -91,7 +127,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
             <span className="text-sm">Analytics</span>
           </button>
           <div className="text-gray-400 text-xs sm:text-sm">
-            {filteredGames.length} of {mockGames.length} games
+            {filteredGames.length} of {games.length} games
           </div>
         </div>
       </div>
@@ -176,6 +212,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
               <button
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                 className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 transition-colors text-white"
+                title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
               >
                 {sortOrder === 'asc' ? '↑' : '↓'}
               </button>
@@ -243,10 +280,30 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
                   </div>
                 </div>
                 
-                <div className="text-right flex-shrink-0">
-                  <div className="text-pink-400 font-semibold text-xs sm:text-sm">Winner</div>
-                  <div className="text-base sm:text-xl font-bold text-white">{game.winner}</div>
-                  <div className="text-gray-400 text-xs sm:text-sm">Score: {winningScore} (Margin: {margin})</div>
+                <div className="flex items-center space-x-2">
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-pink-400 font-semibold text-xs sm:text-sm">Winner</div>
+                    <div className="text-base sm:text-xl font-bold text-white">{game.winner}</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Score: {winningScore} (Margin: {margin})</div>
+                  </div>
+                  
+                  {/* Delete Button */}
+                  {onDeleteGame && (
+                    <div className="flex flex-col space-y-1">
+                      <button
+                        onClick={() => handleDeleteGame(game.id)}
+                        disabled={deletingId === game.id}
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors disabled:opacity-50"
+                        title="Delete game"
+                      >
+                        {deletingId === game.id ? (
+                          <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -256,7 +313,7 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
                   .sort((a, b) => b.score - a.score)
                   .map((player, index) => (
                     <div 
-                      key={player.playerId} 
+                      key={player.playerId || index} 
                       className={`bg-gray-700 rounded-lg p-3 sm:p-4 transition-all duration-200 hover:bg-gray-600 cursor-pointer ${
                         player.playerName === game.winner ? 'ring-2 ring-pink-500 bg-gradient-to-br from-pink-500/10 to-purple-600/10' : ''
                       }`}
@@ -283,14 +340,18 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
                           <span className="text-gray-400 text-xs sm:text-sm">Position</span>
                           <span className="text-xs sm:text-sm">{player.startingPosition}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400 text-xs sm:text-sm">Settlements</span>
-                          <span className="text-xs sm:text-sm">{player.settlements}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400 text-xs sm:text-sm">Cities</span>
-                          <span className="text-xs sm:text-sm">{player.cities}</span>
-                        </div>
+                        {player.settlements !== undefined && player.settlements !== null && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-400 text-xs sm:text-sm">Settlements</span>
+                            <span className="text-xs sm:text-sm">{player.settlements}</span>
+                          </div>
+                        )}
+                        {player.cities !== undefined && player.cities !== null && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-400 text-xs sm:text-sm">Cities</span>
+                            <span className="text-xs sm:text-sm">{player.cities}</span>
+                          </div>
+                        )}
                         
                         {/* Special Achievements */}
                         <div className="flex flex-wrap gap-1 mt-2">
@@ -340,12 +401,14 @@ const GameHistory: React.FC<GameHistoryProps> = ({ onPageChange }) => {
         <div className="text-center py-12">
           <Trophy className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
           <h3 className="text-lg sm:text-xl font-semibold text-gray-400 mb-2">No games found</h3>
-          <p className="text-gray-500 text-sm sm:text-base mb-4">Try adjusting your search or filter criteria</p>
+          <p className="text-gray-500 text-sm sm:text-base mb-4">
+            {games.length === 0 ? 'Add some games to get started!' : 'Try adjusting your search or filter criteria'}
+          </p>
           <button
             onClick={() => onPageChange('add-game')}
             className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
           >
-            Add Your First Game
+            {games.length === 0 ? 'Add Your First Game' : 'Add New Game'}
           </button>
         </div>
       )}

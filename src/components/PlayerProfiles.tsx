@@ -1,20 +1,33 @@
 import React, { useState } from 'react';
 import { User, Trophy, Target, TrendingUp, Award, Calendar, ArrowLeft, Eye, BarChart3, Filter, ChevronDown, Star, Medal, Zap } from 'lucide-react';
-import { mockPlayers, mockGames, achievements } from '../data/mockData';
+import { GameRecord, Player } from '../types';
 import { calculatePlayerStats, getPlayerAchievements } from '../utils/statsCalculator';
 
 interface PlayerProfilesProps {
+  games: GameRecord[];
+  players: Player[];
   onPageChange: (page: string) => void;
 }
 
-const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ onPageChange }) => {
+const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ games, players, onPageChange }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState({ start: '', end: '' });
   const [expansionFilter, setExpansionFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Debug: Log what data PlayerProfiles receives
+  console.log('PlayerProfiles received data:', {
+    gamesCount: games.length,
+    playersCount: players.length,
+    firstGame: games[0] ? games[0].expansion : 'No games',
+    isUsingMockData: games.length > 0 && games[0].id.startsWith('mock') // Check if using mock data
+  });
+
+  // Get unique expansions from actual games
+  const expansions = Array.from(new Set(games.map(game => game.expansion)));
+
   // Filter games based on selected filters
-  const filteredGames = mockGames.filter(game => {
+  const filteredGames = games.filter(game => {
     const gameDate = new Date(game.date);
     const startDate = dateFilter.start ? new Date(dateFilter.start) : null;
     const endDate = dateFilter.end ? new Date(dateFilter.end) : null;
@@ -25,10 +38,10 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ onPageChange }) => {
     return dateMatch && expansionMatch;
   });
 
-  const playersWithStats = mockPlayers.map(player => ({
+  const playersWithStats = players.map(player => ({
     ...player,
     stats: calculatePlayerStats(player.id, filteredGames),
-    achievements: getPlayerAchievements(player.id, mockGames)
+    achievements: getPlayerAchievements(player.id, games)
   })).sort((a, b) => b.stats.winRate - a.stats.winRate);
 
   const selectedPlayerData = selectedPlayer 
@@ -51,6 +64,31 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ onPageChange }) => {
   };
 
   const hasActiveFilters = dateFilter.start || dateFilter.end || expansionFilter;
+
+  // Show message if no data
+  if (!players.length) {
+    return (
+      <div className="space-y-4 sm:space-y-6 pb-20 lg:pb-0">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+            Player Profiles
+          </h1>
+        </div>
+        
+        <div className="text-center py-12 bg-gray-800 rounded-xl border border-gray-700">
+          <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-400 mb-2">No players found</h3>
+          <p className="text-gray-500 text-sm sm:text-base mb-4">Add some games to see player profiles</p>
+          <button
+            onClick={() => onPageChange('add-game')}
+            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
+          >
+            Add Your First Game
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (selectedPlayerData) {
     const playerGames = getPlayerGames(selectedPlayerData.id);
@@ -173,33 +211,39 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ onPageChange }) => {
             <span>Performance Over Time</span>
           </h3>
           
-          <div className="space-y-3">
-            {selectedPlayerData.stats.recentForm.slice(-10).reverse().map((score, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div className="w-8 text-gray-400 text-sm">#{selectedPlayerData.stats.recentForm.length - index}</div>
-                <div className="flex-1 bg-gray-700 rounded-full h-4 relative">
-                  <div 
-                    className={`h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2 ${
-                      score >= 12 ? 'bg-gradient-to-r from-yellow-500 to-orange-600' :
-                      score >= 10 ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
-                      score >= 8 ? 'bg-gradient-to-r from-blue-500 to-cyan-600' :
-                      score >= 6 ? 'bg-gradient-to-r from-purple-500 to-pink-600' :
-                      'bg-gradient-to-r from-red-500 to-pink-600'
-                    }`}
-                    style={{ width: `${Math.max((score / 15) * 100, 10)}%` }}
-                  >
-                    <span className="text-white text-xs font-medium">{score}</span>
+          {selectedPlayerData.stats.recentForm.length > 0 ? (
+            <div className="space-y-3">
+              {selectedPlayerData.stats.recentForm.slice(-10).reverse().map((score, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div className="w-8 text-gray-400 text-sm">#{selectedPlayerData.stats.recentForm.length - index}</div>
+                  <div className="flex-1 bg-gray-700 rounded-full h-4 relative">
+                    <div 
+                      className={`h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2 ${
+                        score >= 12 ? 'bg-gradient-to-r from-yellow-500 to-orange-600' :
+                        score >= 10 ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
+                        score >= 8 ? 'bg-gradient-to-r from-blue-500 to-cyan-600' :
+                        score >= 6 ? 'bg-gradient-to-r from-purple-500 to-pink-600' :
+                        'bg-gradient-to-r from-red-500 to-pink-600'
+                      }`}
+                      style={{ width: `${Math.max((score / 15) * 100, 10)}%` }}
+                    >
+                      <span className="text-white text-xs font-medium">{score}</span>
+                    </div>
+                  </div>
+                  <div className="w-16 text-right">
+                    {score >= 12 && <span className="text-yellow-400">🏆</span>}
+                    {score >= 10 && score < 12 && <span className="text-green-400">🎯</span>}
+                    {score >= 8 && score < 10 && <span className="text-blue-400">📈</span>}
+                    {score < 8 && <span className="text-gray-400">📉</span>}
                   </div>
                 </div>
-                <div className="w-16 text-right">
-                  {score >= 12 && <span className="text-yellow-400">🏆</span>}
-                  {score >= 10 && score < 12 && <span className="text-green-400">🎯</span>}
-                  {score >= 8 && score < 10 && <span className="text-blue-400">📈</span>}
-                  {score < 8 && <span className="text-gray-400">📉</span>}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400 py-8">
+              No performance data available
+            </div>
+          )}
         </div>
 
         {/* Recent Games */}
@@ -217,29 +261,35 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ onPageChange }) => {
             </button>
           </div>
           
-          <div className="space-y-3">
-            {recentGames.map((game) => (
-              <div 
-                key={game.id} 
-                className={`p-3 rounded-lg transition-all duration-200 cursor-pointer hover:scale-105 ${
-                  game.isWin ? 'bg-green-500/10 border border-green-500/30 hover:border-green-500/50' : 
-                  'bg-gray-700 hover:bg-gray-600'
-                }`}
-                onClick={() => onPageChange('games')}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-white text-sm sm:text-base truncate">{game.expansion}</span>
-                  <span className={`text-xs sm:text-sm font-medium ${game.isWin ? 'text-green-400' : 'text-gray-400'}`}>
-                    {game.isWin ? '🏆 WIN' : '❌ LOSS'}
-                  </span>
+          {recentGames.length > 0 ? (
+            <div className="space-y-3">
+              {recentGames.map((game) => (
+                <div 
+                  key={game.id} 
+                  className={`p-3 rounded-lg transition-all duration-200 cursor-pointer hover:scale-105 ${
+                    game.isWin ? 'bg-green-500/10 border border-green-500/30 hover:border-green-500/50' : 
+                    'bg-gray-700 hover:bg-gray-600'
+                  }`}
+                  onClick={() => onPageChange('games')}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-white text-sm sm:text-base truncate">{game.expansion}</span>
+                    <span className={`text-xs sm:text-sm font-medium ${game.isWin ? 'text-green-400' : 'text-gray-400'}`}>
+                      {game.isWin ? '🏆 WIN' : '❌ LOSS'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs sm:text-sm text-gray-400">
+                    <span>{new Date(game.date).toLocaleDateString()}</span>
+                    <span>Score: {game.playerScore.score}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs sm:text-sm text-gray-400">
-                  <span>{new Date(game.date).toLocaleDateString()}</span>
-                  <span>Score: {game.playerScore.score}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400 py-8">
+              No recent games found
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -324,12 +374,9 @@ const PlayerProfiles: React.FC<PlayerProfilesProps> = ({ onPageChange }) => {
                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white"
               >
                 <option value="">All Expansions</option>
-                <option value="Base Game">Base Game</option>
-                <option value="Seafarers">Seafarers</option>
-                <option value="Cities & Knights">Cities & Knights</option>
-                <option value="Traders & Barbarians">Traders & Barbarians</option>
-                <option value="Explorers & Pirates">Explorers & Pirates</option>
-                <option value="Rise of the Inkas">Rise of the Inkas</option>
+                {expansions.map(expansion => (
+                  <option key={expansion} value={expansion}>{expansion}</option>
+                ))}
               </select>
             </div>
             

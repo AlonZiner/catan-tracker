@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BarChart3, TrendingUp, Target, Users, Trophy, MapPin, Zap, Clock, Flame, Shield, ArrowLeft, Eye, Filter, ChevronDown, PieChart } from 'lucide-react';
-import { mockGames, mockPlayers } from '../data/mockData';
 import { 
   getWinDistribution, 
   getExpansionStats, 
@@ -15,19 +14,22 @@ import {
   getGameDurationAnalysis,
   getClutchPerformance
 } from '../utils/statsCalculator';
+import { GameRecord, Player } from '../types';
 
 interface AnalyticsProps {
+  games: GameRecord[];
+  players: Player[];
   onPageChange: (page: string) => void;
 }
 
-const Analytics: React.FC<AnalyticsProps> = ({ onPageChange }) => {
+const Analytics: React.FC<AnalyticsProps> = ({  games, players, onPageChange }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [dateFilter, setDateFilter] = useState({ start: '', end: '' });
   const [expansionFilter, setExpansionFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
   // Filter games based on selected filters
-  const filteredGames = mockGames.filter(game => {
+  const filteredGames = games.filter(game => {
     const gameDate = new Date(game.date);
     const startDate = dateFilter.start ? new Date(dateFilter.start) : null;
     const endDate = dateFilter.end ? new Date(dateFilter.end) : null;
@@ -852,16 +854,16 @@ const Analytics: React.FC<AnalyticsProps> = ({ onPageChange }) => {
                   <thead>
                     <tr>
                       <th className="text-left p-2 text-gray-400">Player</th>
-                      {mockPlayers.slice(0, 4).map(player => (
+                      {players.slice(0, 4).map(player => (
                         <th key={player.id} className="text-center p-2 text-gray-400 min-w-[80px]">{player.name}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {mockPlayers.slice(0, 4).map(player => (
+                    {players.slice(0, 4).map(player => (
                       <tr key={player.id} className="hover:bg-gray-600/50 transition-colors">
                         <td className="p-2 font-medium text-white">{player.name}</td>
-                        {mockPlayers.slice(0, 4).map(opponent => (
+                        {players.slice(0, 4).map(opponent => (
                           <td key={opponent.id} className="text-center p-2">
                             {player.name === opponent.name ? (
                               <span className="text-gray-500">-</span>

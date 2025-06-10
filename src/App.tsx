@@ -131,7 +131,7 @@ function App() {
       case 'dashboard':
         return <Dashboard games={games} players={players} onPageChange={setCurrentPage} />;
       case 'games':
-        return <GameHistory games={games} onPageChange={setCurrentPage} onUpdateGame={handleUpdateGame} onDeleteGame={handleDeleteGame} />;
+        return <GameHistory games={games} players={players} onPageChange={setCurrentPage} onDeleteGame={handleDeleteGame} />;
       case 'players':
         return <PlayerProfiles games={games} players={players} onPageChange={setCurrentPage} />;
       case 'analytics':
