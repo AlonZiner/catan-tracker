@@ -84,7 +84,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onPageChange }) => {
             title="Refresh data"
           >
             <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-            <span className="text-sm">Refresh</span>
           </button>
           <div className="text-gray-400 text-xs sm:text-sm">
             Last updated: {new Date().toLocaleDateString()}
