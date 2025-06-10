@@ -104,7 +104,7 @@ function App() {
       );
     }
 
-    if (error) {
+    if (games.length == 0 || error) {
       return (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4 max-w-md mx-auto p-6">

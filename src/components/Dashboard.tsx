@@ -372,37 +372,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onPageChange }) => {
           })}
         </div>
       </div>
-
-      {/* Quick Actions */}
-      <div className="bg-gradient-to-r from-pink-500/10 to-purple-600/10 border border-pink-500/30 rounded-xl p-4 sm:p-6">
-        <h3 className="text-lg font-semibold mb-4 text-pink-400">Quick Actions</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <button
-            onClick={() => onPageChange('add-game')}
-            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Add New Game
-          </button>
-          <button
-            onClick={() => onPageChange('players')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            View Players
-          </button>
-          <button
-            onClick={() => onPageChange('analytics')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Analytics
-          </button>
-          <button
-            onClick={() => onPageChange('games')}
-            className="bg-gray-700 hover:bg-gray-600 p-3 rounded-lg text-white font-medium transition-all duration-200 transform hover:scale-105"
-          >
-            Game History
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

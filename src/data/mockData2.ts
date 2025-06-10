@@ -1,10 +1,10 @@
 import { GameRecord, Player, Achievement } from '../types';
 
 export const mockPlayers: Player[] = [
-  { id: '1', name: 'Ades', avatar: '💪🏻', joinDate: '2021-10-15' },
-  { id: '2', name: 'Avishai', avatar: '🔥', joinDate: '2021-10-15' },
-  { id: '3', name: 'Ziner', avatar: '🍕', joinDate: '2021-10-15' },
-  { id: '4', name: 'Tomer', avatar: '🩴', joinDate: '2021-02-15' }
+  { playerId: '1', name: 'Ades', avatar: '💪🏻', joinDate: '2021-10-15' },
+  { playerId: '2', name: 'Avishai', avatar: '🔥', joinDate: '2021-10-15' },
+  { playerId: '3', name: 'Ziner', avatar: '🍕', joinDate: '2021-10-15' },
+  { playerId: '4', name: 'Tomer', avatar: '🩴', joinDate: '2021-02-15' }
 ];
 
 export const expansions = [

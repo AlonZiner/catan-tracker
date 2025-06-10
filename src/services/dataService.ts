@@ -1,12 +1,13 @@
 // src/services/dataService.ts
 import { GameRecord, Player } from '../types';
+import { FirebaseGameService } from './firebase';
 
 class DataService {
   private games: GameRecord[] = [];
   private players: Player[] = [];
   private isLoaded = false;
   private useFirebase = false;
-  private firebaseService: any = null;
+  private firebaseService: FirebaseGameService | null = null;
 
   constructor() {
     // Check if Firebase should be used (only if config is available)
@@ -92,6 +93,7 @@ class DataService {
       // Add players first
       for (const player of mockPlayers) {
         await this.firebaseService.addPlayer({
+          playerId: player.playerId,
           name: player.name,
           avatar: player.avatar,
           joinDate: player.joinDate
@@ -123,22 +125,14 @@ class DataService {
   }
 
   async getGames(): Promise<GameRecord[]> {
-    console.log('DataService.getGames() called');
-    await this.loadData();
-    console.log('Returning games:', this.games.length);
     return [...this.games];
   }
 
   async getPlayers(): Promise<Player[]> {
-    console.log('DataService.getPlayers() called');
-    await this.loadData();
-    console.log('Returning players:', this.players.length);
     return [...this.players];
   }
 
   async addGame(game: Omit<GameRecord, 'id'>): Promise<GameRecord> {
-    await this.loadData();
-
     // Auto-create players if they don't exist
     for (const gamePlayer of game.players) {
       const existingPlayer = this.players.find(p => p.name === gamePlayer.playerName);
@@ -196,8 +190,6 @@ class DataService {
   }
 
   async updateGame(id: string, updates: Partial<GameRecord>): Promise<GameRecord | null> {
-    await this.loadData();
-
     if (this.useFirebase && this.firebaseService) {
       // Use Firebase
       try {
@@ -240,8 +232,6 @@ class DataService {
   }
 
   async deleteGame(id: string): Promise<boolean> {
-    await this.loadData();
-
     if (this.useFirebase && this.firebaseService) {
       // Use Firebase
       try {
@@ -278,8 +268,6 @@ class DataService {
 
   // Player operations for Firebase
   async addPlayer(playerData: Omit<Player, 'id'>): Promise<Player> {
-    await this.loadData();
-
     if (this.useFirebase && this.firebaseService) {
       try {
         const playerId = await this.firebaseService.addPlayer(playerData);

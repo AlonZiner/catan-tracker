@@ -59,8 +59,6 @@ export class FirebaseGameService {
 
             const games = snapshot.docs.map(doc => {
                 const data = doc.data();
-                console.log('Raw game data:', data);
-
                 return {
                     id: doc.id,
                     ...data,
@@ -180,8 +178,6 @@ export class FirebaseGameService {
 
             const players = snapshot.docs.map(doc => {
                 const data = doc.data();
-                console.log('Raw player data:', data);
-
                 return {
                     ...data
                 } as Player;
