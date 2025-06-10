@@ -11,16 +11,16 @@ export interface GameRecord {
   expansion: string;
   winner: string;
   players: PlayerScore[];
-  duration?: number; // in minutes
+  duration?: number | null; // in minutes
 }
 
 export interface PlayerScore {
   playerId: string;
   playerName: string;
   score: number;
-  startingPosition: number;
-  settlements: number;
-  cities: number;
+  startingPosition: number | null;
+  settlements: number | null;
+  cities: number | null;
   longestRoad: boolean;
   largestArmy: boolean;
 }

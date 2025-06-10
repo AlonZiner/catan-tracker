@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { firebaseService } from '../services/firebase';
 import { GameRecord, Player } from '../types';
 // Import mock data as fallback for offline/development
-import { mockGames, mockPlayers } from '../data/mockData';
+import { mockGames, mockPlayers } from '../data/mockData2';
 
 export function useFirebaseGames() {
   const [games, setGames] = useState<GameRecord[]>([]);

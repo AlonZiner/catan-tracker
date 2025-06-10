@@ -1,5 +1,5 @@
 import { GameRecord, PlayerStats, Player, Achievement } from '../types';
-import { achievements } from '../data/mockData';
+import { achievements } from '../data/mockData2';
 
 export function calculatePlayerStats(playerId: string, games: GameRecord[]): PlayerStats {
   const playerGames = games.filter(game => 

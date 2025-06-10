@@ -75,7 +75,7 @@ class DataService {
     } catch (error) {
       console.warn('Loading from external sources failed, using mock data:', error);
       // Fallback to mock data
-      const { mockGames, mockPlayers } = await import('../data/mockData');
+      const { mockGames, mockPlayers } = await import('../data/mockData2');
       this.games = mockGames;
       this.players = mockPlayers;
       this.isLoaded = true;
@@ -87,7 +87,7 @@ class DataService {
 
     try {
       console.log('Seeding Firebase with initial data...');
-      const { mockGames, mockPlayers } = await import('../data/mockData');
+      const { mockGames, mockPlayers } = await import('../data/mockData2');
 
       // Add players first
       for (const player of mockPlayers) {
