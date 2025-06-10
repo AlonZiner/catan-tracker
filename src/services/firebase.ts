@@ -14,6 +14,13 @@ import {
 } from 'firebase/firestore';
 import { GameRecord, Player } from '../types';
 
+console.log('=== ENVIRONMENT DEBUG ===');
+console.log('NODE_ENV:', import.meta.env.MODE);
+console.log('All env vars:', Object.keys(import.meta.env));
+console.log('VITE_FIREBASE_API_KEY exists:', !!import.meta.env.VITE_FIREBASE_API_KEY);
+console.log('VITE_FIREBASE_PROJECT_ID:', import.meta.env.VITE_FIREBASE_PROJECT_ID);
+console.log('==========================');
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -23,7 +30,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-console.log('Firebase Config:', { projectId: firebaseConfig.projectId });
+console.log('Firebase Config - Project ID:', firebaseConfig.projectId);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
